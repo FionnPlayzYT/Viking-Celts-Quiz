@@ -1,0 +1,449 @@
+<!-- index.html: The main HTML structure of the Greek Mythology Quiz -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greek Mythology Quiz</title>
+    <!-- Load the Inter font for better typography, from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS for utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind CSS configuration to extend default theme (e.g., add custom fonts)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'], // Define 'Inter' font family
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- style.css: Custom styles for the quiz, enhanced with Tailwind for responsive design -->
+    <style>
+        /*
+         * Custom styles for specific elements not fully covered by Tailwind,
+         * or for overriding default behaviors for a more specific look.
+         * Tailwind classes are primarily used directly in the HTML for most styling.
+         */
+
+        body {
+            /* Ensure the body takes full viewport height and allows flexbox centering */
+            min-height: 100vh;
+        }
+
+        /* General styling for question text */
+        .question-text {
+            font-size: 1.25rem; /* Equivalent to text-xl */
+            line-height: 1.75rem; /* Equivalent to leading-7 */
+            color: #333; /* Darker gray for readability */
+            margin-bottom: 1.5rem; /* Equivalent to mb-6 */
+        }
+
+        /* Container for options (multiple choice, true/false) */
+        .options-container {
+            text-align: left; /* Align options to the left */
+        }
+
+        /* Individual option labels */
+        .option-label {
+            display: block; /* Make each label take full width */
+            margin-bottom: 0.75rem; /* Space between options */
+            padding: 0.75rem 1rem; /* Padding inside the label */
+            border: 1px solid #e0e0e0; /* Light gray border */
+            border-radius: 0.5rem; /* Rounded corners */
+            cursor: pointer; /* Indicate interactivity */
+            transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
+            background-color: #f8f8f8; /* Slightly off-white background */
+            color: #333; /* Text color */
+            font-size: 1rem; /* Base font size */
+        }
+
+        .option-label:hover {
+            background-color: #e0e0e0; /* Lighter background on hover */
+            border-color: #c0c0c0; /* Darker border on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+        }
+
+        /* Hide default radio buttons visually but keep them functional */
+        .option-label input[type="radio"] {
+            appearance: none; /* Remove default radio button styling */
+            width: 1.25rem; /* Custom size for radio button */
+            height: 1.25rem;
+            border: 2px solid #a0a0a0; /* Border for custom radio */
+            border-radius: 50%; /* Make it round */
+            margin-right: 0.75rem; /* Space between custom radio and text */
+            vertical-align: middle; /* Align with text */
+            outline: none; /* Remove outline on focus */
+            cursor: pointer; /* Indicate interactivity */
+            position: relative; /* For custom checked state */
+            flex-shrink: 0; /* Prevent shrinking in flex container */
+        }
+
+        /* Custom checked state for radio buttons */
+        .option-label input[type="radio"]:checked {
+            background-color: #007bff; /* Blue fill when checked */
+            border-color: #007bff; /* Blue border when checked */
+        }
+
+        /* Inner dot for custom radio button when checked */
+        .option-label input[type="radio"]:checked::before {
+            content: '';
+            display: block;
+            width: 0.625rem; /* Size of the inner dot */
+            height: 0.625rem;
+            background-color: white; /* White dot */
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Center the dot */
+        }
+
+        /* Style for the short answer input field */
+        .short-answer-input {
+            width: calc(100% - 2rem); /* Full width minus padding */
+            padding: 0.75rem 1rem; /* Padding inside input */
+            margin-bottom: 1.5rem; /* Space below input */
+            border: 1px solid #ddd; /* Light gray border */
+            border-radius: 0.5rem; /* Rounded corners */
+            font-size: 1rem; /* Base font size */
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* Subtle inner shadow */
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .short-answer-input:focus {
+            border-color: #007bff; /* Blue border on focus */
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Focus ring effect */
+            outline: none; /* Remove default outline */
+        }
+
+        /* Utility class to hide elements */
+        .hidden {
+            display: none !important; /* Force hide */
+        }
+
+        /* Feedback message styling (correct/incorrect) */
+        #feedback {
+            margin-top: 1.5rem; /* Space above feedback */
+            padding: 1rem; /* Padding inside feedback box */
+            border-radius: 0.5rem; /* Rounded corners */
+            font-weight: bold;
+            font-size: 1.125rem; /* text-lg */
+        }
+
+        .correct {
+            background-color: #d4edda; /* Light green background */
+            color: #155724; /* Dark green text */
+            border: 1px solid #c3e6cb; /* Green border */
+        }
+
+        .incorrect {
+            background-color: #f8d7da; /* Light red background */
+            color: #721c24; /* Dark red text */
+            border: 1px solid #f5c6cb; /* Red border */
+        }
+
+        /* Result display at the end */
+        #result {
+            margin-top: 1.5rem; /* Space above result */
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: bold;
+            color: #333; /* Dark gray text */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 640px) {
+            .quiz-container {
+                padding: 1rem; /* Smaller padding on small screens */
+            }
+
+            h1 {
+                font-size: 2rem; /* Adjust title size for small screens */
+            }
+
+            .question-text {
+                font-size: 1.1rem; /* Adjust question text size */
+            }
+
+            .option-label {
+                padding: 0.6rem 0.8rem; /* Smaller padding for options */
+                font-size: 0.95rem; /* Smaller font size for options */
+            }
+
+            .short-answer-input {
+                padding: 0.6rem 0.8rem; /* Smaller padding for input */
+            }
+
+            button {
+                width: 100%; /* Full width buttons on small screens */
+                padding: 0.8rem 1.2rem; /* Slightly smaller button padding */
+            }
+        }
+    </style>
+</head>
+<body class="font-inter">
+    <!-- Main container for the quiz application -->
+    <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8 w-full max-w-md md:max-w-lg lg:max-w-xl">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-blue-800 mb-6">Greek Mythology Quiz</h1>
+
+            <!-- Quiz content will be injected here by JavaScript -->
+            <div id="quiz" class="space-y-4">
+                <!-- Question and options/input will appear here -->
+            </div>
+
+            <!-- Action buttons for the quiz -->
+            <div class="flex flex-col sm:flex-row justify-center mt-6 space-y-3 sm:space-y-0 sm:space-x-4">
+                <button id="submit-btn" class="bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-green-600 hover:to-green-700 transition duration-300 ease-in-out transform hover:scale-105">
+                    Submit Answer
+                </button>
+                <button id="next-btn" class="hidden bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-blue-600 hover:to-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
+                    Next Question
+                </button>
+            </div>
+
+            <!-- Feedback area for correct/incorrect answers -->
+            <div id="feedback" class="hidden mt-6 p-4 rounded-lg text-center font-bold text-lg">
+                <!-- Feedback message will appear here -->
+            </div>
+
+            <!-- Result area displayed at the end of the quiz -->
+            <div id="result" class="hidden mt-6 p-4 rounded-lg text-center font-bold text-xl text-gray-700">
+                <!-- Quiz results will appear here -->
+            </div>
+
+            <!-- Credit for the quiz creator -->
+            <div class="text-center text-gray-500 text-sm mt-8">
+                Made by Fionn Syam for the use of Benjamin Wigley
+            </div>
+        </div>
+    </div>
+
+    <!-- script.js: The JavaScript logic for the quiz, handling questions, answers, and display -->
+    <script>
+        // Define the quiz questions as an array of objects
+        const quizQuestions = [
+            {
+                question: "True or False: The Vikings used ravens to find they're way",
+                type: 'true_false',
+                answer: "True"
+            },
+            {
+                question: "True or False: The Celts were around in 978 BCE",
+                type: 'true_false',
+                answer: "False"
+            },
+            {
+                question: "True or False: Vanhalla where viking heroes went when they died",
+                type: 'true_false',
+                answer: "True"
+            },
+            {
+                question: "True or False: The Celts are very Superstituis",
+                type: 'true_false',
+                answer: "True"
+            },
+            {
+                question: "True or False: Is Hades a Viking god",
+                type: 'true_false',
+                answer: "False" // Corrected to match exact spelling for comparison
+            },
+            {
+                question: "True or False: THe Celts has a compass which is in colors",
+                type: 'true_false',
+                answer: "True"
+            },
+            {
+                question: "True or False: The Celts leader when the Roman invaded was Boudica",
+                type: 'true_false',
+                answer: "True"
+            },
+            {
+                question: "True or False: The Celts took cookies on their sails",
+                type: 'true_false',
+                answer: "True"
+            }
+        ];
+
+        // Initialize quiz state variables
+        let currentQuestionIndex = 0; // Tracks the current question being displayed
+        let score = 0; // Stores the user's score
+        let shuffledQuestions = []; // Array to hold questions in random order
+
+        // Get references to DOM elements
+        const quizDiv = document.getElementById('quiz');
+        const submitButton = document.getElementById('submit-btn');
+        const nextButton = document.getElementById('next-btn');
+        const feedbackDiv = document.getElementById('feedback');
+        const resultDiv = document.getElementById('result');
+
+        // Event listener to start the quiz when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', startGame);
+
+        /**
+         * Initializes the quiz: shuffles questions, resets score and index,
+         * and displays the first question.
+         */
+        function startGame() {
+            // Create a shallow copy of the quizQuestions array to avoid modifying the original
+            shuffledQuestions = [...quizQuestions];
+
+            // Fisher-Yates shuffle algorithm to randomize question order
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            score = 0;
+
+            // Ensure correct button visibility and clear previous feedback/results
+            submitButton.classList.remove('hidden'); // Show submit button
+            nextButton.classList.add('hidden');    // Hide next button
+            feedbackDiv.classList.add('hidden');   // Hide feedback
+            resultDiv.classList.add('hidden');     // Hide results
+
+            // Display the first question
+            displayQuestion();
+        }
+
+        /**
+         * Displays the current question based on `currentQuestionIndex`.
+         * Renders different input types (radio, text) based on question type.
+         */
+        function displayQuestion() {
+            // Clear previous feedback and reset its styling
+            feedbackDiv.classList.add('hidden');
+            feedbackDiv.textContent = '';
+            feedbackDiv.className = 'hidden mt-6 p-4 rounded-lg text-center font-bold text-lg'; // Reset classes
+
+            // Adjust button visibility for a new question
+            submitButton.classList.remove('hidden');
+            nextButton.classList.add('hidden');
+
+            // Check if there are more questions to display
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                const q = shuffledQuestions[currentQuestionIndex];
+                let questionHtml = `
+                    <div class="question-text">
+                        <h3 class="text-xl font-semibold mb-2">Question ${currentQuestionIndex + 1}:</h3>
+                        <p class="text-gray-700">${q.question}</p>
+                    </div>
+                `;
+
+                // Render options based on question type
+                if (q.type === 'multiple_choice') {
+                    questionHtml += '<div class="options-container">';
+                    q.options.forEach((option) => {
+                        questionHtml += `
+                            <label class="option-label flex items-center">
+                                <input type="radio" name="answer" value="${option}" class="mr-3">
+                                <span>${option}</span>
+                            </label>
+                        `;
+                    });
+                    questionHtml += '</div>';
+                } else if (q.type === 'true_false') {
+                    questionHtml += `
+                        <div class="options-container">
+                            <label class="option-label flex items-center">
+                                <input type="radio" name="answer" value="True" class="mr-3">
+                                <span>True</span>
+                            </label>
+                            <label class="option-label flex items-center">
+                                <input type="radio" name="answer" value="False" class="mr-3">
+                                <span>False</span>
+                            </label>
+                        </div>
+                    `;
+                } else if (q.type === 'short_answer') {
+                    questionHtml += `
+                        <input type="text" class="short-answer-input block w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-blue-500 focus:border-blue-500" id="short-answer" placeholder="Type your answer here">
+                    `;
+                }
+                quizDiv.innerHTML = questionHtml; // Update the quiz container with the new question
+            } else {
+                // If no more questions, show the final results
+                showResults();
+            }
+        }
+
+        // Add event listeners for the submit and next buttons
+        submitButton.addEventListener('click', checkAnswer);
+        nextButton.addEventListener('click', () => {
+            currentQuestionIndex++; // Move to the next question
+            displayQuestion();     // Display the next question
+        });
+
+        /**
+         * Checks the user's answer against the correct answer for the current question.
+         * Updates score and displays feedback.
+         */
+        function checkAnswer() {
+            const q = shuffledQuestions[currentQuestionIndex];
+            let userAnswer;
+
+            // Get user's answer based on question type
+            if (q.type === 'multiple_choice' || q.type === 'true_false') {
+                const selectedOption = quizDiv.querySelector('input[name="answer"]:checked');
+                userAnswer = selectedOption ? selectedOption.value : null; // Get value or null if nothing selected
+            } else if (q.type === 'short_answer') {
+                userAnswer = quizDiv.querySelector('#short-answer').value.trim(); // Get trimmed text input
+            }
+
+            let isCorrect = false;
+            // Compare user's answer (case-insensitive) with the correct answer
+            if (userAnswer && userAnswer.toLowerCase() === q.answer.toLowerCase()) {
+                isCorrect = true;
+            }
+
+            // Display feedback
+            feedbackDiv.classList.remove('hidden');
+            if (isCorrect) {
+                feedbackDiv.textContent = "Correct!";
+                feedbackDiv.className = 'correct mt-6 p-4 rounded-lg text-center font-bold text-lg'; // Apply correct styling
+                score++; // Increment score if correct
+            } else {
+                feedbackDiv.textContent = `Incorrect. The correct answer was: ${q.answer}`;
+                feedbackDiv.className = 'incorrect mt-6 p-4 rounded-lg text-center font-bold text-lg'; // Apply incorrect styling
+            }
+
+            // Hide submit button, show next button
+            submitButton.classList.add('hidden');
+            nextButton.classList.remove('hidden');
+
+            // Disable all inputs for the current question after submission to prevent re-answering
+            const inputs = quizDiv.querySelectorAll('input');
+            inputs.forEach(input => input.disabled = true);
+        }
+
+        /**
+         * Displays the final quiz results, score, and a personalized message.
+         */
+        function showResults() {
+            quizDiv.innerHTML = ''; // Clear the quiz content area
+            submitButton.classList.add('hidden'); // Hide buttons
+            nextButton.classList.add('hidden');
+            feedbackDiv.classList.add('hidden'); // Hide feedback
+
+            resultDiv.classList.remove('hidden'); // Show results div
+
+            let resultText = `<p class="mb-4">You scored ${score} out of ${shuffledQuestions.length}.</p>`;
+            // Provide different messages based on performance
+            if (score === shuffledQuestions.length) {
+                resultText += "<p class='text-green-600'>Excellent! You got all correct!</p>";
+            } else if (score >= shuffledQuestions.length * 0.7) {
+                resultText += "<p class='text-blue-600'>Well done! You have a good understanding.</p>";
+            } else {
+                resultText += "<p class='text-red-600'>Keep practicing! There's room for improvement.</p>";
+            }
+            resultDiv.innerHTML = resultText; // Update results div
+        }
+    </script>
+</body>
+</html>
