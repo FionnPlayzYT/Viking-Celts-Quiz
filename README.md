@@ -1,3 +1,3 @@
-I made this code for Benjamin Wigley for his hostory presentation
+I made this code for Benjamin Wigley for his history presentation
 
                                                   - Fionn_Playz
